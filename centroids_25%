@@ -1,0 +1,40 @@
+import numpy as np
+
+def evaluate_centroid(data):
+    """
+    Function to evaluate the centroid of a given data
+    """
+    centroid = np.mean(data, axis=0)
+    return centroid
+
+def evaluate_distance(data, centroid):
+    """
+    Function to evaluate the Euclidean distance between each data point and centroid
+    """
+    distances = np.zeros(len(data))
+    diff = data - centroid
+    distances = np.sqrt(np.sum(diff**2, axis=1))
+    return distances
+
+def identify_25_percent(distances):
+    """
+    Function to identify the 25% nearest data points for each class
+    """
+    nearest_indices = np.argsort(distances)[:int(0.25*len(distances))]
+    return nearest_indices
+
+# Input data
+data_class1 = np.array([[1, 2], [2, 3], [3, 4]])
+data_class2 = np.array([[4, 5], [5, 6], [6, 7]])
+
+# Evaluate the centroid for each class
+centroid_class1 = evaluate_centroid(data_class1)
+centroid_class2 = evaluate_centroid(data_class2)
+
+# Evaluate the distances between each data point and centroid for each class
+distances_class1 = evaluate_distance(data_class1, centroid_class1)
+distances_class2 = evaluate_distance(data_class2, centroid_class2)
+
+# Identify the 25% nearest data points for each class
+nearest_indices_class1 = identify_25_percent(distances_class1)
+nearest_indices_class2 = identify_25_percent(distances_class2)
