@@ -38,3 +38,51 @@ distances_class2 = evaluate_distance(data_class2, centroid_class2)
 # Identify the 25% nearest data points for each class
 nearest_indices_class1 = identify_25_percent(distances_class1)
 nearest_indices_class2 = identify_25_percent(distances_class2)
+
+
+#############################
+import numpy as np
+
+def set_centroids(data, class_var):
+    """
+    Function to set the centroids for each class
+    """
+    unique_classes = np.unique(class_var)
+    centroids = np.zeros((len(unique_classes), data.shape[1]))
+    for i, c in enumerate(unique_classes):
+        class_data = data[class_var == c, :]
+        centroids[i, :] = np.mean(class_data, axis=0)
+    return centroids
+
+def evaluate_distance(data, centroids):
+    """
+    Function to evaluate the Euclidean distance between each data point and centroids
+    """
+    distances = np.zeros((len(data), centroids.shape[0]))
+    for i in range(centroids.shape[0]):
+        diff = data - centroids[i]
+        distances[:, i] = np.sqrt(np.sum(diff**2, axis=1))
+    return distances
+
+def identify_25_percent(distances):
+    """
+    Function to identify the 25% nearest data points for each class
+    """
+    nearest_indices = np.argsort(distances, axis=0)[:int(0.25*len(distances))]
+    return nearest_indices
+
+# Input data
+data = np.array([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]])
+
+# Input class variable
+class_var = np.array([0, 0, 1, 1, 1, 0])
+
+# Set the centroids for each class
+centroids = set_centroids(data, class_var)
+
+# Evaluate the distances between each data point and centroids
+distances = evaluate_distance(data, centroids)
+
+# Identify the 25% nearest data points for each class
+nearest_indices = identify_25_percent(distances)
+
