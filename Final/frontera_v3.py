@@ -5,7 +5,7 @@ from sklearn.metrics import pairwise_distances
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import cvxpy as cvx
-from scipy.stats import bernoulli, zscore
+from scipy.stats import bernoulli
 from cvxpy import GUROBI as solverGUROBI
 from gurobipy import *
 import umap
@@ -84,11 +84,10 @@ class Frontera:
         self.random_round_Sn = None
         self.random_round_Aj = None
         self.random_round_optimal_val = None
-        self.Protypes = {}
         
         self.num_vectors = None
         self.random_vectors = None
-        self.groups = {}
+        self.groups = None
         self.centroids = None
         
     def distance(self, x0, x1):
@@ -352,8 +351,7 @@ class Frontera:
         for key, value in self.Frontier_Point_A_X.items():
             for point in value:
                 X_1.append(point)
-                #y_1.append(int(''.join(filter(str.isdigit, key.split(':')[1]))))
-                y_1.append(0)
+                y_1.append(int(''.join(filter(str.isdigit, key.split(':')[1]))))
         self.X_1 = np.array(X_1)
         self.y_1 = np.array(y_1)
         self._epsilon = np.percentile(self.X_1[:, 1], 5)
@@ -690,48 +688,45 @@ class Frontera:
         self.random_round_Sn = random_round_Sn
         self.random_round_optimal_val = sum(random_round_optimal_value)
 
-        self.w_ = [x for x, A_j in zip(self.X_1, self.random_round_Aj) if A_j == 1]
+        self.w_ = [x for x, A_j in zip(self.X, self.random_round_Aj) if A_j == 1]
         self.w_ = np.array (self.w_)
 
-        self.c_w_ = [y for y, A_j in zip(self.y_1, self.random_round_Aj) if A_j == 1]
+        self.c_w_ = [y for y, A_j in zip(self.y, self.random_round_Aj) if A_j == 1]
         self.prototype_length = self.w_.shape[0]
         self.data_info = update_data_info
-        
-        self.Protypes.update({'Protypes' : self.w_}) 
 
 # prototypes = proto_selector.w_
 # prototype_labels = proto_selector.c_w_
 #-----------------------------------------------------------------------------------
+    def generate_random_vectors(self):
+        """
+        Generates random vectors of the same dimensions as the input data.
+        """
+        unique_vals = np.unique(self.y_1)
+        self.num_vectors = round(len(unique_vals)/2)
+        dim = self.X_1.shape[1]
+        self.random_vectors = np.random.randn(self.num_vectors, dim)
 
     def create_groups(self):
         """
         Creates groups based on the dot product of the projection of input data
         on the random vectors.
         """
-        
-        unique_vals = np.unique(self.y)
-        self.num_vectors = np.amax([self.X.shape[1],len(np.unique(self.y)-1)], axis=0)
-        
-        X_z_score = zscore(self.X_1)
-        
-        M_vectors = np.random.randn(self.X_1.shape[1], self.num_vectors)
-        R = X_z_score@M_vectors
-        S = np.where(R>0, 1, 0)
-        
-        # column vector to convert binary vector to integer e.g. (1,0,1)->5
-        binary_column = 2**np.arange(self.num_vectors).reshape(-1,  1)
-        
-        # convert each band into a single integer, 
-        # i.e. convert band matrices to band columns
-        S = np.hstack([M@binary_column for M in S])
-                    
-        # Create a dictionary to store the LSH points
-        for group in np.unique(S):
-            select_indices_ = np.where( S == group )[0]
-            points_by_groups = self.X_1[select_indices_]
-            LSH_Point = {str(group) : points_by_groups}
-            self.groups.update(LSH_Point)
-            
+        if self.random_vectors is None:
+            self.generate_random_vectors()
+
+        self.groups = {}
+        for i, vec in enumerate(self.random_vectors):
+            for j, x in enumerate(self.X):
+                dot_product = np.dot(vec, x)
+                if dot_product >= 0:
+                    group_key = f'g{i}_p'
+                else:
+                    group_key = f'g{i}_n'
+
+                if group_key not in self.groups:
+                    self.groups[group_key] = []
+                self.groups[group_key].append(x)
 
     def compute_centroids(self):
         """
@@ -744,10 +739,7 @@ class Frontera:
         for group_key, group_data in self.groups.items():
             group_matrix = np.array(group_data)
             centroid = np.mean(group_matrix, axis=0)
-            LSH_centroid = {'Centroid Group: ' + group_key : centroid}
-            self.centroids.update(LSH_centroid)
-            
-        
+            self.centroids[group_key] = centroid
 
     def fit_lsh(self):
         """
@@ -786,6 +778,7 @@ class Frontera:
         elif self.method == 'LSH':
             self.get_frontier()
             self.get_X1_Y1()
+            self.generate_random_vectors()
             self.create_groups()
             self.fit_lsh()
         else:
@@ -898,30 +891,6 @@ class Frontera:
                                              # colorscale='Viridis',  # Choose a colorscale
                                              opacity=1)
                                          ))
-                
-        for key, value in self.Protypes.items():
-            fig.add_trace(go.Scatter(x=value[:, col_1], y=value[:, col_2],
-                                     mode='markers',
-                                     name=key,
-                                     marker=dict(
-                                         symbol=300,
-                                         size=50,
-                                         color=np.random.randint(100),  # Set color to a random integer value
-                                         # colorscale='Viridis',  # Choose a colorscale
-                                         opacity=1)
-                                    ))
-            
-        for key, value in self.centroids.items():
-            fig.add_trace(go.Scatter(x=[value[0]], y=[value[1]],
-                                     mode='markers',
-                                     name=key,
-                                     marker=dict(
-                                         symbol=300,
-                                         size=50,
-                                         color=np.random.randint(100),  # Set color to a random integer value
-                                         # colorscale='Viridis',  # Choose a colorscale
-                                         opacity=1)
-                                    )) 
 
         # Update the layout properties of the plot
         fig.update_layout(
@@ -932,8 +901,6 @@ class Frontera:
 
         # Display the plot
         fig.show()
-        
-        
     def plot_Vectors(self, col_1, col_2):
         # Set initial state for the loop
         door = True
@@ -1013,7 +980,6 @@ class Frontera:
 
         # Display the plot
         fig.show()
-        
     def plot_UMAP(self):
         # Perform UMAP dimensionality reduction on the data
         trans = umap.UMAP(random_state=42).fit(self.X)
