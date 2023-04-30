@@ -850,7 +850,7 @@ class Frontera:
 
         return clustered_points, cluster_median_y_labels # cluster_labels, 
 #    --------------------------------------------------------------------        
-    def frontier(self, X=None, y=None):
+    def frontier(self):
         if self.method == 'frontier_reduction':
             self.get_frontier()
             self.centroid_regions()
