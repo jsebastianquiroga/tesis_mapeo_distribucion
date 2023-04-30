@@ -838,11 +838,13 @@ class Frontera:
 
         #return centroid_arrays, centroid_median_labels
 #    --------------------------------------------------------------------
-    def find_optimal_clusters(X, y, max_k=10):
+    def find_optimal_clusters(self):
+        X = self.X_1
+        y = self.y_1
         inerties = []
         silhouette_scores = []
 
-        for k in range(2, max_k+1):
+        for k in range(2, 11):
             kmedoids = KMedoids(n_clusters=k, random_state=42).fit(X)
             inerties.append(kmedoids.inertia_)
             silhouette_scores.append(silhouette_score(X, kmedoids.labels_))
@@ -889,7 +891,7 @@ class Frontera:
         elif self.method == 'KM':
             self.get_frontier()
             self.get_X1_Y1()
-            clustered_points, cluster_median_y_labels = self.find_optimal_clusters(X, y)
+            self.find_optimal_clusters()
             #return clustered_points, cluster_median_y_labels 
 
         else:
