@@ -827,9 +827,6 @@ class Frontera:
         return centroid_arrays, centroid_median_labels
 #    --------------------------------------------------------------------
     def find_optimal_clusters(X, y, max_k=10):
-        if len(X.shape) == 1:
-            X = X.reshape(-1, 1)
-
         inerties = []
         silhouette_scores = []
 
@@ -851,10 +848,9 @@ class Frontera:
         # Compute the median y_label for each cluster
         cluster_median_y_labels = {i: np.median(cluster_labels[i]) for i in range(optimal_k)}
 
-        return clustered_points, cluster_median_y_labels
-
+        return clustered_points, cluster_median_y_labels # cluster_labels, 
 #    --------------------------------------------------------------------        
-    def frontier(self): 
+    def frontier(self, X=None, y=None):
         if self.method == 'frontier_reduction':
             self.get_frontier()
             self.centroid_regions()
@@ -867,21 +863,23 @@ class Frontera:
             self.get_X1_Y1()
             self.fit()
             return self.w_, self.c_w_
-        
+
         elif self.method == 'LSH':
             self.get_frontier()
             self.get_X1_Y1()
             self.create_groups()
             self.fit_lsh()
             return centroid_arrays, centroid_median_labels
-        
+
         elif self.method == 'KM':
             self.get_frontier()
             self.get_X1_Y1()
-            self.find_optimal_clusters()
+            clustered_points, cluster_median_y_labels = self.find_optimal_clusters(X, y)
             return clustered_points, cluster_median_y_labels 
+
         else:
             raise ValueError("Invalid method specified")
+
 
 #    --------------------------------------------------------------------
     def plot_muestra_2D(self, col_1, col_2, include_layout=True):
