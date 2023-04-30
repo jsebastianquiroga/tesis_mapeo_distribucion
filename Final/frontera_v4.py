@@ -375,6 +375,7 @@ class Frontera:
         # Return the vectors, their dimensions, and the labels
         return vec_redu, labels_reduct #, vec_redu.shape
 #    --------------------------------------------------------------------
+
     def get_X1_Y1(self):
         """
         Extracts X_1 and y_1 arrays based on the Frontier_Point_A_X attribute.
@@ -395,11 +396,15 @@ class Frontera:
                 y_1.append(0)
         self.X_1 = np.array(X_1)
         self.y_1 = np.array(y_1)
+        print("Shape of self.X_1:", self.X_1.shape)
+        print("Content of self.X_1:", self.X_1)
         if len(self.X_1.shape) > 1:
             self._epsilon = np.percentile(self.X_1[:, 1], 5)
         else:
             self._epsilon = np.percentile(self.X_1, 5)
         #X_1[:,1].mean() #assigne the mean of the distances to _epsilon
+
+
     def labelsInfo(self):
         """ Extracts the unique class label from the data X.
 
@@ -821,29 +826,6 @@ class Frontera:
 
         return centroid_arrays, centroid_median_labels
 #    --------------------------------------------------------------------
-    def get_X1_Y1(self):
-        """
-        Extracts X_1 and y_1 arrays based on the Frontier_Point_A_X attribute.
-
-        Returns
-        -------
-        X_1 : numpy array
-            Array containing the data points corresponding to the frontier points.
-        y_1 : numpy array
-            Array containing the labels corresponding to the frontier points.
-        """
-        X_1 = []
-        y_1 = []
-        for key, value in self.Frontier_Point_A_X.items():
-            for point in value:
-                X_1.append(point)
-                #y_1.append(int(''.join(filter(str.isdigit, key.split(':')[1]))))
-                y_1.append(0)
-        self.X_1 = np.array(X_1)
-        self.y_1 = np.array(y_1)
-        self._epsilon = np.percentile(self.X_1[:, 1], 5)
-        #X_1[:,1].mean() #assigne the mean of the distances to _epsilon
-
     def find_optimal_clusters(X, y, max_k=10):
         inerties = []
         silhouette_scores = []
