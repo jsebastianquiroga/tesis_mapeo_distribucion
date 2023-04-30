@@ -395,7 +395,10 @@ class Frontera:
                 y_1.append(0)
         self.X_1 = np.array(X_1)
         self.y_1 = np.array(y_1)
-        self._epsilon = np.percentile(self.X_1[:, 1], 5)
+        if len(self.X_1.shape) > 1:
+            self._epsilon = np.percentile(self.X_1[:, 1], 5)
+        else:
+            self._epsilon = np.percentile(self.X_1, 5)
         #X_1[:,1].mean() #assigne the mean of the distances to _epsilon
     def labelsInfo(self):
         """ Extracts the unique class label from the data X.
