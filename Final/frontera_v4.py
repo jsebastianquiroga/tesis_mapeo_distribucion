@@ -827,6 +827,9 @@ class Frontera:
         return centroid_arrays, centroid_median_labels
 #    --------------------------------------------------------------------
     def find_optimal_clusters(X, y, max_k=10):
+        if len(X.shape) == 1:
+            X = X.reshape(-1, 1)
+
         inerties = []
         silhouette_scores = []
 
@@ -848,7 +851,8 @@ class Frontera:
         # Compute the median y_label for each cluster
         cluster_median_y_labels = {i: np.median(cluster_labels[i]) for i in range(optimal_k)}
 
-        return clustered_points, cluster_median_y_labels # cluster_labels, 
+        return clustered_points, cluster_median_y_labels
+
 #    --------------------------------------------------------------------        
     def frontier(self): 
         if self.method == 'frontier_reduction':
