@@ -856,26 +856,26 @@ class Frontera:
             self.centroid_regions()
             self.calculate_vectors()
             self.filter_vector()
-            return vec_redu, labels_reduct
+            #return vec_redu, labels_reduct
 
         elif self.method == 'prototypes':
             self.get_frontier()
             self.get_X1_Y1()
             self.fit()
-            return self.w_, self.c_w_
+            #return self.w_, self.c_w_
 
         elif self.method == 'LSH':
             self.get_frontier()
             self.get_X1_Y1()
             self.create_groups()
             self.fit_lsh()
-            return centroid_arrays, centroid_median_labels
+            #return centroid_arrays, centroid_median_labels
 
         elif self.method == 'KM':
             self.get_frontier()
             self.get_X1_Y1()
             clustered_points, cluster_median_y_labels = self.find_optimal_clusters(X, y)
-            return clustered_points, cluster_median_y_labels 
+            #return clustered_points, cluster_median_y_labels 
 
         else:
             raise ValueError("Invalid method specified")
