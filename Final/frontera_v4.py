@@ -97,7 +97,10 @@ class Frontera:
         self.random_vectors = None
         self.groups = {}
         self.centroids = {}
-        
+
+        self.centroid_vector = None
+        self.centroid_label = None
+
     def distance(self, x0, x1):
         # This function calculates the pairwise squared Euclidean distance between two sets of points x0 and x1
         # The squared Euclidean distance between two points x and y in Euclidean space is given by the formula:
@@ -373,7 +376,11 @@ class Frontera:
         for i in range( len(self.dic_categorias.keys()) ):
             self.color_list[i] = np.random.randint(0, 1000)
         # Return the vectors, their dimensions, and the labels
-        return vec_redu, labels_reduct #, vec_redu.shape
+
+        self.centroid_vector = vec_redu
+        self.centroid_label = labels_reduct
+
+        #return vec_redu, labels_reduct #, vec_redu.shape
 #    --------------------------------------------------------------------
 
     def get_X1_Y1(self):
@@ -664,7 +671,9 @@ class Frontera:
         self.data_info = update_data_info
         self.objectiveValue()
 
-        return self.w_, self.c_w_
+        self.centroid_vector = self.w_
+        self.centroid_label = self.c_w_
+        #return self.w_, self.c_w_
 
     def objectiveValue(self):
         """ Here Randomized Rounding Algorithm is performed to recover the integer values we need 
@@ -824,7 +833,10 @@ class Frontera:
         # Compute the median y_label for each centroid
         centroid_median_labels = [np.median(y_labels) for y_labels in centroid_labels]
 
-        return centroid_arrays, centroid_median_labels
+        self.centroid_vector = centroid_arrays
+        self.centroid_label = centroid_median_labels
+
+        #return centroid_arrays, centroid_median_labels
 #    --------------------------------------------------------------------
     def find_optimal_clusters(X, y, max_k=10):
         inerties = []
@@ -848,7 +860,10 @@ class Frontera:
         # Compute the median y_label for each cluster
         cluster_median_y_labels = {i: np.median(cluster_labels[i]) for i in range(optimal_k)}
 
-        return clustered_points, cluster_median_y_labels # cluster_labels, 
+        self.centroid_vector = clustered_points
+        self.centroid_label = cluster_median_y_labels
+
+        #return clustered_points, cluster_median_y_labels # cluster_labels, 
 #    --------------------------------------------------------------------        
     def frontier(self):
         if self.method == 'frontier_reduction':
