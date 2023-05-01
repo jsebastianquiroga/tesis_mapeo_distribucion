@@ -43,14 +43,14 @@ class Frontera:
     - Frontier_Vector: Dictionary for storing frontier vectors
     - class_vector: Dictionary for storing class vectors
     """
-    def __init__(self, X, y, method='frontier_reduction'):
+    def __init__(self, X, y, method='frontier_reduction', percentil_min=None, percentil_max=None, N_points_frontera=None):
         self.X = X  # Data points
         self.y = y  # Labels for data points
 
-        # Hard-code values for percentiles and number of points for the frontier
-        self.percentil_min = max(20, 0)  # Minimum percentile for the frontier
-        self.percentil_max = 20  # Maximum percentile for the frontier
-        self.N_points_frontera = int(0.20 * len(X))  # Number of points for the frontier
+        # Set the default values for percentiles and number of points for the frontier
+        self.percentil_min = percentil_min if percentil_min is not None else max(20, 0)  # Minimum percentile for the frontier
+        self.percentil_max = percentil_max if percentil_max is not None else 20  # Maximum percentile for the frontier
+        self.N_points_frontera = N_points_frontera if N_points_frontera is not None else int(0.20 * len(X))  # Number of points for the frontier
 
         self.method = method 
         self.method = method  # Dimensionality reduction method ('frontier_reduction' or 'prototypes')
