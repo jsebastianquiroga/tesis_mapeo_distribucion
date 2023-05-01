@@ -878,31 +878,31 @@ class Frontera:
             labels_reduct = self.label
             return vec_redu, labels_reduct
 
-        elif self.method == 'prototypes':
-            self.get_frontier()
-            self.get_X1_Y1()
-            self.fit()
-            # assign return values to variables
-            w_ = self.w_
-            c_w_ = self.c_w_
-            return w_, c_w_
+        # elif self.method == 'prototypes':
+        #     self.get_frontier()
+        #     self.get_X1_Y1()
+        #     self.fit()
+        #     # assign return values to variables
+        #     w_ = self.w_
+        #     c_w_ = self.c_w_
+        #     return w_, c_w_
 
-        elif self.method == 'LSH':
-            self.get_frontier()
-            self.get_X1_Y1()
-            self.create_groups()
-            self.fit_lsh()
-            # assign return values to variables
-            centroid_arrays = self.centroids
-            centroid_median_labels = self.centroid_label
-            return centroid_arrays, centroid_median_labels
+        # elif self.method == 'LSH':
+        #     self.get_frontier()
+        #     self.get_X1_Y1()
+        #     self.create_groups()
+        #     self.fit_lsh()
+        #     # assign return values to variables
+        #     centroid_arrays = self.centroids
+        #     centroid_median_labels = self.centroid_label
+        #     return centroid_arrays, centroid_median_labels
 
-        elif self.method == 'KM':
-            self.get_frontier()
-            self.get_X1_Y1()
-            # assign return values to variables
-            clustered_points, cluster_median_y_labels = self.find_optimal_clusters()
-            return clustered_points, cluster_median_y_labels 
+        # elif self.method == 'KM':
+        #     self.get_frontier()
+        #     self.get_X1_Y1()
+        #     # assign return values to variables
+        #     clustered_points, cluster_median_y_labels = self.find_optimal_clusters()
+        #     return clustered_points, cluster_median_y_labels 
 
         else:
             raise ValueError("Invalid method specified")
