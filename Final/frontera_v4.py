@@ -31,7 +31,7 @@ class Frontera:
     - percentil_min: Minimum percentile for the frontier
     - percentil_max: Maximum percentile for the frontier
     - N_points_frontera: Number of points for the frontier
-    - method: The dimensionality reduction method to use ('frontier_reduction' or 'prototypes')
+    - method: The dimensionality reduction method to use ('frontier_reduction' or 'prototypes' or 'LSH' or ''KNN)
     - dic_categorias: Dictionary for storing category information
     - dic_min_dst: Dictionary for storing minimum distances
     - list_dist_median: List for storing median distances
@@ -52,8 +52,7 @@ class Frontera:
         self.percentil_max = percentil_max if percentil_max is not None else 20  # Maximum percentile for the frontier
         self.N_points_frontera = N_points_frontera if N_points_frontera is not None else int(0.20 * len(X))  # Number of points for the frontier
 
-        self.method = method 
-        self.method = method  # Dimensionality reduction method ('frontier_reduction' or 'prototypes')
+        self.method = method  # Dimensionality reduction method ('frontier_reduction' or 'prototypes' ok 'KNN')
         # Dictionaries for storing category information and minimum distances
         self.dic_categorias = {}
         self.dic_min_dst = {}
@@ -897,12 +896,12 @@ class Frontera:
             centroid_median_labels = self.centroid_label
             return centroid_arrays, centroid_median_labels
 
-        # elif self.method == 'KM':
-        #     self.get_frontier()
-        #     self.get_X1_Y1()
-        #     # assign return values to variables
-        #     clustered_points, cluster_median_y_labels = self.find_optimal_clusters()
-        #     return clustered_points, cluster_median_y_labels 
+        elif self.method == 'KM':
+            self.get_frontier()
+            self.get_X1_Y1()
+            # assign return values to variables
+            clustered_points, cluster_median_y_labels = self.find_optimal_clusters()
+            return clustered_points, cluster_median_y_labels 
 
         else:
             raise ValueError("Invalid method specified")
