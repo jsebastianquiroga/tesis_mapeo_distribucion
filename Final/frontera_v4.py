@@ -100,6 +100,23 @@ class Frontera:
         self.centroid_vector = None
         self.centroid_label = None
 
+    def get_valid_percentiles(self, min_percentile, max_percentile, distances, min_data_percentage):
+        percentile_min = np.percentile(distances, min_percentile)
+        percentile_max = np.percentile(distances, max_percentile)
+        num_points = len(distances)
+
+        while len(np.where((distances > percentile_min) & (distances < percentile_max))[0]) < min_data_percentage * num_points:
+            min_percentile -= 5
+            max_percentile += 5
+            percentile_min = np.percentile(distances, min_percentile)
+            percentile_max = np.percentile(distances, max_percentile)
+
+            if min_percentile <= 0 and max_percentile >= 100:
+                break
+
+        return percentile_min, percentile_max
+
+
     def distance(self, x0, x1):
         # This function calculates the pairwise squared Euclidean distance between two sets of points x0 and x1
         # The squared Euclidean distance between two points x and y in Euclidean space is given by the formula:
@@ -137,8 +154,8 @@ class Frontera:
             # Calculate row-wise mean of the distance matrix
             row = np.mean(dist, axis=1)
             # Select indices of rows that are within the specified percentiles
-            select_indices_row = np.where(
-                (row > np.percentile(row, self.percentil_min)) & (row < np.percentile(row, self.percentil_max)))[0]
+            valid_percentile_min, valid_percentile_max = self.get_valid_percentiles(self.percentil_min, self.percentil_max, row, 0.2)
+            select_indices_row = np.where((row > valid_percentile_min) & (row < valid_percentile_max))[0]
             # Get corresponding data points from the first category
             min_dst_row = self.dic_categorias.get(categories[0])[select_indices_row]
             # Update the self.dic_min_dst dictionary with the new values
@@ -147,8 +164,8 @@ class Frontera:
             # Calculate column-wise mean of the distance matrix
             column = np.mean(dist, axis=0)
             # Select indices of columns that are within the specified percentiles
-            select_indices_column = np.where(
-                (column > np.percentile(column, self.percentil_min)) & (column < np.percentile(column, self.percentil_max)))[0]
+            valid_percentile_min, valid_percentile_max = self.get_valid_percentiles(self.percentil_min, self.percentil_max, column, 0.2)
+            select_indices_column = np.where((column > valid_percentile_min) & (column < valid_percentile_max))[0]
             # Get corresponding data points from the second category
             min_dst_column = self.dic_categorias.get(categories[1])[select_indices_column]
             # Update the self.dic_min_dst dictionary with the new values
